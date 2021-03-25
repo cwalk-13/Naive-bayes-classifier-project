@@ -279,9 +279,9 @@ class MyNaiveBayesClassifier:
             #create list to hold all posteriors for col
             col_posteriors = [i]
             #loop through each C
-            for C in c_list:
+            for c_index in range(len(c_list)):
                 #create list to hold P(V|C)'s for this class
-                posteriors = [C]
+                posteriors = [c_list[c_index]]
                 #loop through each V
                 for V in val_list:
                     # create var to hold the count for number of rows that are C&V
@@ -289,11 +289,14 @@ class MyNaiveBayesClassifier:
                     #loop through each row
                     for j in range(len(X_train)):
                         #if C&V then count++
-                        if str(X_train[j][i]) == str(V) and str(y_train[j]) == str(C):
+                        if str(X_train[j][i]) == str(V) and str(y_train[j]) == str(c_list[c_index]):
                             count += 1
     
                     # calc P(V|C) = count/Total#Rows
                     p = count/len(y_train)
+
+                    p = p/self.priors[c_index][1]
+
                     # make [V_name, P] obj
                     posterior = [V, p]
                     #append obj to list of P(V|C)'s for this class
@@ -301,10 +304,6 @@ class MyNaiveBayesClassifier:
                 col_posteriors.append(posteriors)
             #append col_posteriors, [col_index, [class_label, [val_name, P] ] ], to self.posteriors
             self.posteriors.append(col_posteriors)
-        print("priors")
-        print(self.priors)
-        print("posteriors")
-        print(self.posteriors)
         pass # TODO: fix this
 
     def predict(self, X_test):
@@ -322,7 +321,6 @@ class MyNaiveBayesClassifier:
             1. Calculate all P(Ci|X)
             2. compare them
         """
-        #P(C|X) = P(X|C)*P(C)
         #calc P(X|C) by multiplying every corresponding posterior for each col val
 
         c_list = myutils.get_col_byindex(self.priors, 0)
@@ -334,35 +332,38 @@ class MyNaiveBayesClassifier:
             all_p_cx = []
             #loop through each class label
             for c_list_index in range(len(c_list)):
-                #p_cx = 1: P(C|X)
+                #p_cx: this is P(C|X)
                 p_cx = 0 
                 #loop through each val in the row
                 for curr_val_index in range(len(row)):
                     ##find the posterior for that val in that col
                     #loop through self.posteriors
+                    post_found = False
                     for posteriors in self.posteriors:
+                        if post_found == True:
+                            break
                         #if curr_col_index == self.posteriors[curr_index:A][0]
-                        if curr_val_index == posteriors[0]:   
+                        if curr_val_index == posteriors[0]:
+                            post_found = True   
                             #loop through self.posteriors[A]
-                            for i in range(len(posteriors)-1):
-                                #if self.posteriors[A][curr_index:B][0] == curr class label C
+                            for i in range(len(posteriors)):
                                 if i == 0:
-                                    i += 1
+                                    continue
+                                #if posterior.class == curr class label C
                                 if str(posteriors[i][0]) == str(c_list[c_list_index]):
                                     #loop through the list with that C
                                     for j in range(len(posteriors[i])):
-                                        #if self.posteriors[A][B][C][0] == given attr Val
+                                        #if posterior.val == given attr Val
                                         if str(posteriors[i][j][0]) == str(row[curr_val_index]):
-                                            #p = self.posteriors[A][B][C][1]
                                             p = posteriors[i][j][1]
                                             if p_cx == 0:
                                                 p_cx = 1
                                             p_cx = p_cx*p
+                                            break
                 p_cx = p_cx*self.priors[c_list_index][1]
                 #append p_cx to all_p_cx
                 all_p_cx.append(p_cx)
             #compare each p_cx from that list and find the index of max
-            #max(all_p_cx)
             print(all_p_cx)
             best_p_index = all_p_cx.index(max(all_p_cx))            
             #append the class label with corresponding index to y_predicted
