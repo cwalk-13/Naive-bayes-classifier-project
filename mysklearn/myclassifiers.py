@@ -364,10 +364,7 @@ class MyNaiveBayesClassifier:
                 #append p_cx to all_p_cx
                 all_p_cx.append(p_cx)
             #compare each p_cx from that list and find the index of max
-            print(all_p_cx)
             best_p_index = all_p_cx.index(max(all_p_cx))            
             #append the class label with corresponding index to y_predicted
             y_predicted.append(c_list[best_p_index])
-
-
         return y_predicted

@@ -136,8 +136,8 @@ def test_naive_bayes_classifier_fit():
     nb = MyNaiveBayesClassifier()
     nb.fit(train, y)
     assert nb.priors == [["yes", 5/8],["no", 3/8]]
-    assert nb.posteriors == [[0, ['yes', ['1', 1/2], ['2', 1/8]], ['no', ['1', 1/4], ['2', 1/8]]], \
-                            [1, ['yes', ['5', 1/4], ['6', 3/8]], ['no', ['5', 1/4], ['6', 1/8]]]]
+    assert nb.posteriors == [[0, ['yes', ['1', 0.8], ['2', 0.2]], ['no', ['1', 2/3], ['2', 1/3]]], \
+                            [1, ['yes', ['5', 0.4], ['6', 0.6]], ['no', ['5', 2/3], ['6', 1/3]]]]
 
     # RQ5 (fake) iPhone purchases dataset
     iphone_col_names = ["standing", "job_status", "credit_rating", "buys_iphone"]
@@ -219,3 +219,62 @@ def test_naive_bayes_classifier_predict():
     pred = nb.predict([[1,5]])
     
     assert pred == ["yes"] # TODO: fix this
+    # RQ5 (fake) iPhone purchases dataset
+    iphone_col_names = ["standing", "job_status", "credit_rating", "buys_iphone"]
+    iphone_table = [
+        [1, 3, "fair", "no"],
+        [1, 3, "excellent", "no"],
+        [2, 3, "fair", "yes"],
+        [2, 2, "fair", "yes"],
+        [2, 1, "fair", "yes"],
+        [2, 1, "excellent", "no"],
+        [2, 1, "excellent", "yes"],
+        [1, 2, "fair", "no"],
+        [1, 1, "fair", "yes"],
+        [2, 2, "fair", "yes"],
+        [1, 2, "excellent", "yes"],
+        [2, 2, "excellent", "yes"],
+        [2, 3, "fair", "yes"],
+        [2, 2, "excellent", "no"],
+        [2, 3, "fair", "yes"]
+    ]
+    mypy = MyPyTable(iphone_col_names, iphone_table)
+    y2 = myutils.get_mypycol(mypy, "buys_iphone")
+    nb2 = MyNaiveBayesClassifier()
+    nb2.fit(iphone_table, y2)
+    pred2 = nb2.predict([[1, 2, "fair"]])
+
+    assert pred2 == ["yes"]
+    
+    # Bramer 3.2 train dataset
+    train_col_names = ["day", "season", "wind", "rain", "class"]
+    train_table = [
+        ["weekday", "spring", "none", "none", "on time"],
+        ["weekday", "winter", "none", "slight", "on time"],
+        ["weekday", "winter", "none", "slight", "on time"],
+        ["weekday", "winter", "high", "heavy", "late"], 
+        ["saturday", "summer", "normal", "none", "on time"],
+        ["weekday", "autumn", "normal", "none", "very late"],
+        ["holiday", "summer", "high", "slight", "on time"],
+        ["sunday", "summer", "normal", "none", "on time"],
+        ["weekday", "winter", "high", "heavy", "very late"],
+        ["weekday", "summer", "none", "slight", "on time"],
+        ["saturday", "spring", "high", "heavy", "cancelled"],
+        ["weekday", "summer", "high", "slight", "on time"],
+        ["saturday", "winter", "normal", "none", "late"],
+        ["weekday", "summer", "high", "none", "on time"],
+        ["weekday", "winter", "normal", "heavy", "very late"],
+        ["saturday", "autumn", "high", "slight", "on time"],
+        ["weekday", "autumn", "none", "heavy", "on time"],
+        ["holiday", "spring", "normal", "slight", "on time"],
+        ["weekday", "spring", "normal", "none", "on time"],
+        ["weekday", "spring", "normal", "slight", "on time"]
+    ]
+    mypy2 = MyPyTable(train_col_names, train_table)
+    y3 = myutils.get_mypycol(mypy2, "class")
+    nb3 = MyNaiveBayesClassifier()
+    nb3.fit(train_table, y3)
+    nb3.fit(train_table, y3)
+    pred3 = nb3.predict([["weekday", "winter", "high", "heavy"]])
+
+    assert pred3 == ["cancelled"]
