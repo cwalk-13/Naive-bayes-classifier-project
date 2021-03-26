@@ -59,22 +59,6 @@ def get_frequencies(table, header, col_name):
 
     return values, counts
 
-def get_freq_1col(col):
-    col.sort() # inplace
-    values = []
-    counts = []
-
-    for value in col:
-        if value not in values:
-            # first time we have seen this value
-            values.append(value)
-            counts.append(1)
-        else:
-            # we have seen this value before 
-            counts[-1] += 1 # ok because the list is sorted
-
-    return values, counts
-
 def group_by(table, header, group_by_col_name):
     col = get_column(table, header, group_by_col_name)
     col_index = header.index(group_by_col_name)
@@ -130,7 +114,6 @@ def compute_slope_intercept(x, y):
     return m, b 
 
 def compute_euclidean_distance(v1, v2):
-    print(v1, v2)
     assert len(v1) == len(v2)
 
     dist = np.sqrt(sum([(v1[i] - v2[i]) ** 2 for i in range(len(v1))]))
@@ -233,3 +216,18 @@ def get_freq_str(col):
 def get_mypycol(mypy, col_name):
     return mypy.get_column(col_name, False)
 
+def get_freq_1col(col):
+    col.sort() # inplace
+    values = []
+    counts = []
+
+    for value in col:
+        if value not in values:
+            # first time we have seen this value
+            values.append(value)
+            counts.append(1)
+        else:
+            # we have seen this value before 
+            counts[-1] += 1 # ok because the list is sorted
+
+    return values, counts

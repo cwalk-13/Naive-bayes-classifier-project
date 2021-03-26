@@ -2,6 +2,7 @@ import mysklearn.myutils as myutils
 import numpy as np
 import copy
 import operator
+import random
 
 class MySimpleLinearRegressor:
     """Represents a simple linear regressor.
@@ -153,9 +154,6 @@ class MyKNeighborsClassifier:
             for instance in top_k:
                 dists.append(instance[-1])
                 indices.append(instance[-2])
-            # print("Top K Neighbors")
-            # for instance in top_k:
-            #     print(instance)
             all_distances.append(dists)
             all_neighbor_indices.append(indices)
         
@@ -238,7 +236,7 @@ class MyNaiveBayesClassifier:
             1. Probability of row given class label
                 use independence assumption
                 P(X|C) = P(V1 and C) * P(V2 and C) *...etc
-                    P(V|C) = #C&V/Total#C
+                    P(V|C) = (#C&V/TotalLenTable)/P(C)
                     **only for categorical
             2. Probability of class label given row
                 P(C|X) = P(X|C)*P(C)
@@ -364,7 +362,51 @@ class MyNaiveBayesClassifier:
                 #append p_cx to all_p_cx
                 all_p_cx.append(p_cx)
             #compare each p_cx from that list and find the index of max
-            best_p_index = all_p_cx.index(max(all_p_cx))            
+            best_p_index = all_p_cx.index(max(all_p_cx))         
             #append the class label with corresponding index to y_predicted
             y_predicted.append(c_list[best_p_index])
         return y_predicted
+
+class MyZeroClassifier:
+    def __init__(self):
+        """Initializer for MyZeroClassifier.
+            only takes y_train
+            Zero-R: classifies an instance using "zero rules"... 
+            it always predicts the most common class label in the training set. 
+            For example, if 99% of the dataset is positive instances, it always predicts positive.
+        """
+        self.y_train = None
+
+    def fit(self, y_train):
+        self.y_train = y_train
+        pass
+    
+    def predict(self):
+        vals, counts = myutils.get_freq_str(self.y_train)
+        i = counts.index(max(counts)) 
+        y_predict = vals[i] 
+        return y_predict
+
+class MyRandomClassifier:
+    def __init__(self):
+        """Initializer for MyRandomClassifier.
+            Random classifier: classifies an instance by randomly choosing a class label 
+            (class label probabilities of being chosen are weighted based on their frequency in the training set).
+        """
+        
+        self.y_train = None
+
+    def fit(self, y_train):
+        self.y_train = y_train
+        pass
+
+    def predict(self): 
+        vals, counts = myutils.get_freq_str(self.y_train)
+        p_list = []
+        for count in counts:
+            curr_p = count/len(self.y_train)
+            p_list.append(curr_p)
+
+        pred = np.random.choice(vals, p= p_list)
+
+        return pred
