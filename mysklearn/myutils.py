@@ -3,10 +3,11 @@ import math
 import numpy as np
 import importlib
 import copy
+import random
 import mysklearn.mypytable
 importlib.reload(mysklearn.mypytable)
-from mysklearn.mypytable import MyPyTable 
-
+from mysklearn.mypytable import MyPyTable
+from tabulate import tabulate
 
 # import mysklearn.myutils
 # importlib.reload(mysklearn.myutils)
@@ -114,6 +115,7 @@ def compute_slope_intercept(x, y):
     return m, b 
 
 def compute_euclidean_distance(v1, v2):
+    print(v1, v2)
     assert len(v1) == len(v2)
 
     dist = np.sqrt(sum([(v1[i] - v2[i]) ** 2 for i in range(len(v1))]))
@@ -213,6 +215,13 @@ def get_freq_str(col):
 
     return values, counts
 
+def get_accuracy(actual, pred):
+    correct = 0
+    for i in range(len(actual)):
+        if actual[i] == pred[i]:
+            correct+=1
+    return correct/len(actual)
+
 def get_mypycol(mypy, col_name):
     return mypy.get_column(col_name, False)
 
@@ -231,3 +240,95 @@ def get_freq_1col(col):
             counts[-1] += 1 # ok because the list is sorted
 
     return values, counts
+
+def get_rand_rows(table, num_rows):
+    rand_rows = []
+    for i in range(num_rows):
+        rand_rows.append(table.data[random.randint(0,len(table.data))-1])
+    return rand_rows
+
+def rating(mpg):
+    if mpg < 14:
+        return 1
+    elif mpg < 15:
+        return 2
+    elif mpg < 17:
+        return 3
+    elif mpg < 20:
+        return 4
+    elif mpg < 24:
+        return 5
+    elif mpg < 27:
+        return 6
+    elif mpg < 31:
+        return 7
+    elif mpg < 37:
+        return 8
+    elif mpg < 45:
+        return 9
+    return 10
+
+
+def categorize_weight(val):
+    if val < 2000:
+        weight = 1
+    elif val < 2500:
+        weight = 2
+    elif val < 3000:
+        weight = 3
+    elif val < 3500:
+        weight = 4
+    else:
+        weight = 5
+    return weight
+
+def convert_weights(weight):
+        res = []
+        for val in weight:
+            res.append(categorize_weight(val))
+        return res
+
+def print_results(rows, actual, predicted):
+        for i in range(len(rows)):
+            print('instance:', rows[i])
+            print('class:', predicted[i], 'actual:', actual[i])
+            
+def mpg_to_rating(mpg):
+    for i in range(len(mpg)):
+        mpg[i] = rating(mpg[i])
+    return mpg
+
+def folds_to_train(x, y, train_folds, test_folds):
+    X_train = []
+    y_train = []
+    for row in train_folds:
+        for i in row:
+            X_train.append(x[i])
+            y_train.append(y[i])
+
+    X_test = []
+    y_test = []
+    for row in test_folds:
+        for i in row:
+            X_test.append(x[i])
+            y_test.append(y[i])
+
+    return X_train, y_train, X_test, y_test
+
+def add_config_stats(matrix):
+    del matrix[0]
+    for i,row in enumerate(matrix):
+        row[0] = i+1
+        row.append(sum(row))
+        row.append(round(row[i+1]/row[-1]*100,2))
+        
+def titanic_matrix(matrix):
+    for i,row in enumerate(matrix):
+        row.append(sum(row))
+        row.append(round(row[i]/row[-1]*100,2))
+        row.insert(0, i+1)
+    matrix.append(['Total', matrix[0][1]+matrix[1][1], matrix[0][2]+matrix[1][2], matrix[0][3]+matrix[1][3], \
+                   round(((matrix[0][1]+matrix[1][2])/(matrix[0][3]+matrix[1][3])*100),2)])
+
+def print_tabulate(table, headers):
+    print(tabulate(table, headers, tablefmt="rst"))

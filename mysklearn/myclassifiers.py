@@ -352,6 +352,8 @@ class MyNaiveBayesClassifier:
                                     #loop through the list with that C
                                     for j in range(len(posteriors[i])):
                                         #if posterior.val == given attr Val
+                                        if j == 0:
+                                            continue
                                         if str(posteriors[i][j][0]) == str(row[curr_val_index]):
                                             p = posteriors[i][j][1]
                                             if p_cx == 0:
