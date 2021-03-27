@@ -1,4 +1,9 @@
-# TODO: your reusable general-purpose functions here
+"""
+Charles Walker 
+CPSC 322
+Section 02
+PA5
+"""
 import math 
 import numpy as np
 import importlib

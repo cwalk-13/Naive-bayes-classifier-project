@@ -1,3 +1,9 @@
+"""
+Charles Walker 
+CPSC 322
+Section 02
+PA5
+"""
 import numpy as np
 import scipy.stats as stats 
 
